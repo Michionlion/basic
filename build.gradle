@@ -1,0 +1,118 @@
+defaultTasks 'build'
+
+// assumes git use
+if(!file("lib/basicv2").exists()) {
+    def url = "https://github.com/EgonOlsen71/basicv2.git"
+    println "Downloading BASIC compiler..."
+    exec {
+        commandLine "git", "submodule", "add", "-b", "master", url, "lib/basicv2"
+    }
+    exec {
+        commandLine "git", "submodule", "init"
+    }
+}
+
+
+def getBasicPrograms() {
+    def all = files(file('src').listFiles())
+    return all.filter { it.name.endsWith '.bas' }.sort()
+}
+
+task submodules(type: Exec) {
+    commandLine "git", "submodule", "update", "--init", "--merge", "--remote"
+}
+
+task clean(type: Delete) {
+    delete file("lib/basicv2/dist/basicv2.jar")
+    exec {
+        workingDir "lib/basicv2"
+        commandLine "mvn", "clean"
+        standardOutput = new ByteArrayOutputStream()
+        errorOutput = standardOutput
+        ignoreExitValue = true
+    }
+}
+
+task compilerClasses(type: Exec) {
+    dependsOn submodules
+    outputs.dir file("lib/basicv2/target/classes")
+    inputs.dir file("lib/basicv2/src")
+    workingDir "lib/basicv2"
+    commandLine "mvn", "compile"
+    standardOutput = new ByteArrayOutputStream()
+    errorOutput = standardOutput
+    ignoreExitValue = true
+    doLast {
+        if (execResult.exitValue != 0) {
+            println(standardOutput.toString())
+            throw new GradleException("exec failed; see output above")
+            }
+    }
+}
+
+task compiler(type: Exec) {
+    dependsOn compilerClasses
+    inputs.dir file("lib/basicv2/target/classes")
+    outputs.file file("lib/basicv2/dist/basicv2.jar")
+    workingDir "lib/basicv2"
+    commandLine "ant", "-f", "build_jar.xml"
+    standardOutput = new ByteArrayOutputStream()
+    errorOutput = standardOutput
+    ignoreExitValue = true
+    doLast {
+        if (execResult.exitValue != 0) {
+            println(standardOutput.toString())
+            throw new GradleException("exec failed; see output above")
+            }
+    }
+}
+
+task build {
+    dependsOn compiler
+    getBasicPrograms().each { file ->
+        doLast {
+            println "==> Compiling $file"
+            javaexec {
+                classpath "lib/basicv2/dist/basicv2.jar"
+                main "com.sixtyfour.runner.Runtime"
+                args file.absolutePath
+            }
+            println "==> Complete!\n"
+        }
+    }
+}
+
+task visual(type: JavaExec) {
+    dependsOn compiler
+    classpath "lib/basicv2/dist/basicv2.jar"
+    main "com.sixtyfour.runner.VisualRuntime"
+}
+
+task shell(type: JavaExec) {
+    dependsOn compiler
+    classpath "lib/basicv2/dist/basicv2.jar"
+    main "com.sixtyfour.basicshell.BasicShell"
+}
+
+task mospeed {
+    dependsOn compiler
+    outputs.dir file("bin")
+
+    def debug = false
+
+    getBasicPrograms().each { source ->
+        def compiled = "bin/${source.name.replaceFirst(~/\.[^\.]+$/, '')}.prg"
+        outputs.file file(compiled)
+        inputs.file source
+        doLast {
+            mkdir "bin"
+            println "==> Compiling $source to $compiled"
+            javaexec {
+                classpath "lib/basicv2/dist/basicv2.jar"
+                main "com.sixtyfour.cbmnative.shell.MoSpeedCL"
+                args relativePath(source), "/target=$compiled", "/generatesrc=$debug"
+            }
+            println "==> Complete!\n"
+        }
+    }
+}
