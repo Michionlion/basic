@@ -1,0 +1,4 @@
+[submodule "lib/basicv2"]
+	path = lib/basicv2
+	url = https://github.com/EgonOlsen71/basicv2.git
+	branch = master
