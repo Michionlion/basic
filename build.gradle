@@ -38,7 +38,7 @@ task compilerClasses(type: Exec) {
     outputs.dir file("lib/basicv2/target/classes")
     inputs.dir file("lib/basicv2/src")
     workingDir "lib/basicv2"
-    commandLine "mvn", "compile"
+    commandLine "/usr/bin/mvn", "compile"
     standardOutput = new ByteArrayOutputStream()
     errorOutput = standardOutput
     ignoreExitValue = true
@@ -55,7 +55,7 @@ task compiler(type: Exec) {
     inputs.dir file("lib/basicv2/target/classes")
     outputs.file file("lib/basicv2/dist/basicv2.jar")
     workingDir "lib/basicv2"
-    commandLine "ant", "-f", "build_jar.xml"
+    commandLine "/usr/bin/ant", "-f", "build_jar.xml"
     standardOutput = new ByteArrayOutputStream()
     errorOutput = standardOutput
     ignoreExitValue = true
