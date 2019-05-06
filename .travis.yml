@@ -1,8 +1,8 @@
 # use Java
 language: Java
-jdk: 11
+jdk: oraclejdk11
 
-before_install:
+install:
   - gem install mdl
   - wget https://services.gradle.org/distributions/gradle-5.1-bin.zip
   - unzip -d $HOME gradle-5.1-bin.zip
@@ -17,9 +17,8 @@ before_cache:
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
-    - $HOME/.gradle/caches/5.1
-    - $HOME/.gradle/caches/jars-3
-    - $HOME/.gradle/caches/modules-2
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
 
 # need to run unit tests
 script:
