@@ -36,6 +36,6 @@ cache:
 # need to run unit tests
 script:
   # java checks
-  - gradle clean build mospeed
+  - gradle clean mospeed
   # other linting
   - mdl README.md
