@@ -10,6 +10,8 @@ install:
   - rm -rf gradle-5.1-bin.zip
   # add gradle bin to path at the beginning to ensure it overwrites old gradle
   - export PATH="$HOME/gradle-5.1/bin:$PATH"
+  - which mvn
+  - which ant
 
 
 before_cache:
