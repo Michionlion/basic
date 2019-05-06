@@ -12,10 +12,10 @@ before_install:
 install:
   - gem install mdl
   - wget --no-check-certificate https://www.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.tar.gz
-  - tar -xzvf apache-ant-1.10.5-bin.tar.gz
+  - tar -xzf apache-ant-1.10.5-bin.tar.gz
   - export PATH=$PWD/apache-ant-1.10.5/bin:$PATH
   - wget https://services.gradle.org/distributions/gradle-5.1-bin.zip
-  - unzip -d $HOME gradle-5.1-bin.zip
+  - unzip -q -d $HOME gradle-5.1-bin.zip
   # probably don't need this but just to be sure
   - rm -rf gradle-5.1-bin.zip
   # add gradle bin to path at the beginning to ensure it overwrites old gradle
