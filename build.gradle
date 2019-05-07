@@ -14,8 +14,8 @@ if(!file("lib/basicv2").exists()) {
 
 
 def getBasicPrograms() {
-    def all = files(file('src').listFiles())
-    return all.filter { it.name.endsWith '.bas' }.sort()
+    def all = files(file("src").listFiles())
+    return all.filter { it.name.endsWith ".bas" }.sort()
 }
 
 task submodules(type: Exec) {
@@ -67,15 +67,30 @@ task compiler(type: Exec) {
     }
 }
 
+task finalProject {
+    dependsOn compiler
+    def source = file("src/warish.bas")
+    doLast {
+        println "==> Running $source"
+        javaexec {
+            classpath "lib/basicv2/dist/basicv2.jar"
+            main "com.sixtyfour.runner.Runtime"
+            args source.absolutePath
+            standardInput = System.in
+        }
+        println "==> Complete!\n"
+    }
+}
+
 task run {
     dependsOn compiler
-    getBasicPrograms().each { file ->
+    getBasicPrograms().each { source ->
         doLast {
-            println "==> Running $file"
+            println "==> Running $source"
             javaexec {
                 classpath "lib/basicv2/dist/basicv2.jar"
                 main "com.sixtyfour.runner.Runtime"
-                args file.absolutePath
+                args source.absolutePath
             }
             println "==> Complete!\n"
         }
