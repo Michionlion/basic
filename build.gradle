@@ -67,11 +67,11 @@ task compiler(type: Exec) {
     }
 }
 
-task build {
+task run {
     dependsOn compiler
     getBasicPrograms().each { file ->
         doLast {
-            println "==> Compiling $file"
+            println "==> Running $file"
             javaexec {
                 classpath "lib/basicv2/dist/basicv2.jar"
                 main "com.sixtyfour.runner.Runtime"
@@ -94,7 +94,7 @@ task shell(type: JavaExec) {
     main "com.sixtyfour.basicshell.BasicShell"
 }
 
-task mospeed {
+task build {
     dependsOn compiler
     outputs.dir file("bin")
 
